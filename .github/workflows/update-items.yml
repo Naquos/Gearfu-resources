@@ -57,12 +57,12 @@ jobs:
 
       - name: Compress all JSON files
         run: |
-          gzip -k items.json
-          gzip -k actions.json
-          gzip -k states.json
-          gzip -k recipeResults.json
-          gzip -k jobItems.json
-          gzip -k recipeIngredients.json
+          gzip -kf items.json
+          gzip -kf actions.json
+          gzip -kf states.json
+          gzip -kf recipeResults.json
+          gzip -kf jobItems.json
+          gzip -kf recipeIngredients.json
           echo "✓ Compression terminée"
           ls -lh *.json.gz
 
