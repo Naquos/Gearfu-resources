@@ -1,0 +1,48 @@
+name: Update Items JSON
+
+on:
+  workflow_dispatch: # Déclenché manuellement depuis GitHub
+  schedule:
+    - cron: '0 0 * * 0' # Exécution automatique chaque dimanche à minuit UTC
+
+permissions:
+  contents: write # Autoriser le push vers le repo
+
+jobs:
+  update-items:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch version from Wakfu API
+        id: fetch-version
+        run: |
+          VERSION=$(curl -s https://wakfu.cdn.ankama.com/gamedata/config.json | jq -r '.version')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "✓ Version détectée: $VERSION"
+
+      - name: Download items.json
+        run: |
+          curl -L -o items.json https://wakfu.cdn.ankama.com/gamedata/${{ steps.fetch-version.outputs.version }}/items.json
+          echo "✓ Fichier téléchargé"
+          ls -lh items.json
+
+      - name: Compress with gzip
+        run: |
+          gzip -k items.json
+          echo "✓ Compression terminée"
+          ls -lh items.json.gz
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add items.json.gz
+          git diff --cached --quiet || (
+            git commit -m "chore: update items.json (version ${{ steps.fetch-version.outputs.version }})"
+            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          )
+          echo "✓ Push effectué"
