@@ -30,19 +30,49 @@ jobs:
           echo "✓ Fichier téléchargé"
           ls -lh items.json
 
-      - name: Compress with gzip
+      - name: Download actions.json
+        run: |
+          curl -L -o actions.json https://wakfu.cdn.ankama.com/gamedata/${{ steps.fetch-version.outputs.version }}/actions.json
+          echo "✓ Fichier téléchargé"
+
+      - name: Download states.json
+        run: |
+          curl -L -o states.json https://wakfu.cdn.ankama.com/gamedata/${{ steps.fetch-version.outputs.version }}/states.json
+          echo "✓ Fichier téléchargé"
+
+      - name: Download recipeResults.json
+        run: |
+          curl -L -o recipeResults.json https://wakfu.cdn.ankama.com/gamedata/${{ steps.fetch-version.outputs.version }}/recipeResults.json
+          echo "✓ Fichier téléchargé"
+
+      - name: Download jobItems.json
+        run: |
+          curl -L -o jobItems.json https://wakfu.cdn.ankama.com/gamedata/${{ steps.fetch-version.outputs.version }}/jobItems.json
+          echo "✓ Fichier téléchargé"
+
+      - name: Download recipeIngredients.json
+        run: |
+          curl -L -o recipeIngredients.json https://wakfu.cdn.ankama.com/gamedata/${{ steps.fetch-version.outputs.version }}/recipeIngredients.json
+          echo "✓ Fichier téléchargé"
+
+      - name: Compress all JSON files
         run: |
           gzip -k items.json
+          gzip -k actions.json
+          gzip -k states.json
+          gzip -k recipeResults.json
+          gzip -k jobItems.json
+          gzip -k recipeIngredients.json
           echo "✓ Compression terminée"
-          ls -lh items.json.gz
+          ls -lh *.json.gz
 
       - name: Commit and push changes
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add items.json.gz
+          git add *.json.gz
           git diff --cached --quiet || (
-            git commit -m "chore: update items.json (version ${{ steps.fetch-version.outputs.version }})"
+            git commit -m "chore: update gamedata files (version ${{ steps.fetch-version.outputs.version }})"
             git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           )
           echo "✓ Push effectué"
