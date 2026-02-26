@@ -45,9 +45,9 @@ jobs:
           curl -L -o recipeResults.json https://wakfu.cdn.ankama.com/gamedata/${{ steps.fetch-version.outputs.version }}/recipeResults.json
           echo "✓ Fichier téléchargé"
 
-      - name: Download jobItems.json
+      - name: Download jobsItems.json
         run: |
-          curl -L -o jobItems.json https://wakfu.cdn.ankama.com/gamedata/${{ steps.fetch-version.outputs.version }}/jobItems.json
+          curl -L -o jobsItems.json https://wakfu.cdn.ankama.com/gamedata/${{ steps.fetch-version.outputs.version }}/jobsItems.json
           echo "✓ Fichier téléchargé"
 
       - name: Download recipeIngredients.json
@@ -61,7 +61,7 @@ jobs:
           gzip -kf actions.json
           gzip -kf states.json
           gzip -kf recipeResults.json
-          gzip -kf jobItems.json
+          gzip -kf jobsItems.json
           gzip -kf recipeIngredients.json
           echo "✓ Compression terminée"
           ls -lh *.json.gz
